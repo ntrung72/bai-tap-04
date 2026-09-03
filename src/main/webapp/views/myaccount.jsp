@@ -52,7 +52,7 @@
 <body>
 <div class="container">
     <div class="page-header">
-        <h1>Profile của User</h1>
+        <h1>Profile</h1>
         <p>Cập nhật họ tên, số điện thoại và ảnh đại diện.</p>
     </div>
     <c:if test="${not empty alert}">
@@ -73,10 +73,21 @@
                             <c:url value="/image" var="avatarUrl">
                                 <c:param name="fname" value="${sessionScope.account.avatar}"/>
                             </c:url>
-                            <img class="profile-avatar-image" src="${avatarUrl}" alt="Avatar của ${sessionScope.account.fullName}">
+                            <img id="avatarPreview" class="profile-avatar-image" src="${avatarUrl}" alt="Avatar của ${sessionScope.account.fullName}">
+                            <div id="avatarFallback" class="profile-avatar-fallback" style="display:none;">
+                                <c:choose>
+                                    <c:when test="${not empty sessionScope.account.fullName}">
+                                        ${sessionScope.account.fullName.substring(0,1)}
+                                    </c:when>
+                                    <c:otherwise>
+                                        U
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
                         </c:when>
                         <c:otherwise>
-                            <div class="profile-avatar-fallback">
+                            <img id="avatarPreview" class="profile-avatar-image" src="" alt="Avatar preview" style="display:none;">
+                            <div id="avatarFallback" class="profile-avatar-fallback">
                                 <c:choose>
                                     <c:when test="${not empty sessionScope.account.fullName}">
                                         ${sessionScope.account.fullName.substring(0,1)}
@@ -120,5 +131,33 @@
         </form>
     </div>
 </div>
+<script>
+    const imageInput=document.getElementById("image");
+    const avatarPreview=document.getElementById("avatarPreview");
+    const avatarFallback=document.getElementById("avatarFallback");
+    imageInput.addEventListener("change", function(){
+        const file=this.files[0];
+        if(!file){
+            return;
+        }
+        if(!file.type.startsWith("image/")){
+            alert("Vui lòng chọn file hình ảnh.");
+            this.value="";
+            return;
+        }
+        if(file.size>5*1024*1024){
+            alert("Ảnh không được vượt quá 5MB.");
+            this.value="";
+            return;
+        }
+        const reader=new FileReader();
+        reader.onload=function(e){
+            avatarPreview.src=e.target.result;
+            avatarPreview.style.display="block";
+            avatarFallback.style.display="none";
+        };
+        reader.readAsDataURL(file);
+    });
+</script>
 </body>
 </html>
