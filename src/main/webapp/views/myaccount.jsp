@@ -1,0 +1,124 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile của tôi</title>
+    <style>
+        .profile-edit-layout{
+            display:grid;
+            grid-template-columns:220px 1fr;
+            gap:30px;
+            align-items:start;
+        }
+        .profile-avatar-box{
+            text-align:center;
+        }
+        .profile-avatar-image{
+            width:150px;
+            height:150px;
+            object-fit:cover;
+            border-radius:50%;
+            border:4px solid #dbeafe;
+            background:#f8fafc;
+        }
+        .profile-avatar-fallback{
+            width:150px;
+            height:150px;
+            margin:0 auto;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border-radius:50%;
+            background:#dbeafe;
+            color:#2563eb;
+            font-size:52px;
+            font-weight:700;
+        }
+        .readonly-input{
+            background:#f3f4f6 !important;
+            color:#6b7280;
+            cursor:not-allowed;
+        }
+        @media(max-width:700px){
+            .profile-edit-layout{
+                grid-template-columns:1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <h1>Profile của User</h1>
+        <p>Cập nhật họ tên, số điện thoại và ảnh đại diện.</p>
+    </div>
+    <c:if test="${not empty alert}">
+        <div class="alert alert-error">${alert}</div>
+    </c:if>
+    <c:if test="${not empty sessionScope.profileSuccess}">
+        <div class="alert" style="background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;">
+            ${sessionScope.profileSuccess}
+        </div>
+        <c:remove var="profileSuccess" scope="session"/>
+    </c:if>
+    <div class="card profile-card">
+        <form action="${pageContext.request.contextPath}/member/myaccount" method="post" enctype="multipart/form-data">
+            <div class="profile-edit-layout">
+                <div class="profile-avatar-box">
+                    <c:choose>
+                        <c:when test="${not empty sessionScope.account.avatar}">
+                            <c:url value="/image" var="avatarUrl">
+                                <c:param name="fname" value="${sessionScope.account.avatar}"/>
+                            </c:url>
+                            <img class="profile-avatar-image" src="${avatarUrl}" alt="Avatar của ${sessionScope.account.fullName}">
+                        </c:when>
+                        <c:otherwise>
+                            <div class="profile-avatar-fallback">
+                                <c:choose>
+                                    <c:when test="${not empty sessionScope.account.fullName}">
+                                        ${sessionScope.account.fullName.substring(0,1)}
+                                    </c:when>
+                                    <c:otherwise>
+                                        U
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
+                    <div class="form-group" style="margin-top:20px;text-align:left;">
+                        <label for="image">Ảnh đại diện mới</label>
+                        <input type="file" id="image" name="image" accept="image/png,image/jpeg,image/gif,image/webp">
+                        <div class="form-help">Tối đa 5MB. Hỗ trợ JPG, JPEG, PNG, GIF, WEBP.</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input class="readonly-input" type="text" id="username" value="${sessionScope.account.userName}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input class="readonly-input" type="email" id="email" value="${sessionScope.account.email}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="fullname">Họ tên</label>
+                        <input type="text" id="fullname" name="fullname" value="${sessionScope.account.fullName}" maxlength="255" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Số điện thoại</label>
+                        <input type="text" id="phone" name="phone" value="${sessionScope.account.phone}" maxlength="11" inputmode="numeric" pattern="[0-9]{9,11}" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                        <a href="${pageContext.request.contextPath}/waiting" class="btn btn-secondary">← Quay lại trang chủ</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

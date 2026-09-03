@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemesh>
+    <include-error-pages>false</include-error-pages>
+    <mapping path="/member/*" decorator="web.jsp"/>
+</sitemesh>
